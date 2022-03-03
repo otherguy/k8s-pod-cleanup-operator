@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-lifetime-deployment
+  namespace: pod-cleanup
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: sample-lifetime-deployment
+  template:
+    metadata:
+      labels:
+        app: sample-lifetime-deployment
+      annotations:
+        pod.kubernetes.io/lifetime: "5min 30sec"
+    spec:
+      restartPolicy: Always
+      containers:
+
+        - name: nginx
+          image: nginx:1.14.2
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              cpu: "0.25"
+              memory: 128Mi
+            requests:
+              cpu: "0.1"
+              memory: 64Mi

@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pod-cleanup-operator
+  namespace: pod-cleanup
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pod-cleanup-operator
+  template:
+    metadata:
+      labels:
+        app: pod-cleanup-operator
+    spec:
+      serviceAccountName: pod-cleanup-operator
+      restartPolicy: Always
+      containers:
+
+        - name: operator
+          image: otherguy/pod-cleanup-operator:1.0.0
+          imagePullPolicy: IfNotPresent
+          args:
+          # - --namespace=default
+            - --user
+            - --graceperiod=300
+          # - --dry-run
+            - --quiet
+            - --interval=60
+            - --lifetime-annotation=pod.kubernetes.io/lifetime
+            - --lifetime-max-kills=2
+          # - --label-selector='{"app": "my-sample-app"}'
+            - 'Failed:Shutdown'
+            - 'Failed:Terminated'
+            - 'Failed:NodeShutdown'
+            - 'Failed:Evicted'
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 128Mi
+            requests:
+              cpu: 10m
+              memory: 64Mi
