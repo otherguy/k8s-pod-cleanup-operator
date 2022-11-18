@@ -43,9 +43,6 @@ ENV VCS_REF="${VCS_REF}"
 ENV BUILD_DATE="${BUILD_DATE}"
 ENV VERSION="${VERSION}"
 
-# App revision for AppSignal deploy markers
-ENV APP_REVISION="${VERSION}"
-
 # Configure app
 ENV PYTHONUNBUFFERED="1"
 
