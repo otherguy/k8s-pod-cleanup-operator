@@ -2,7 +2,7 @@
 
 # Start with Google Cloud SDK base image
 # https://console.cloud.google.com/gcr/images/google.com:cloudsdktool/GLOBAL/cloud-sdk
-FROM gcr.io/google.com/cloudsdktool/cloud-sdk:412.0.0-slim
+FROM gcr.io/google.com/cloudsdktool/cloud-sdk:414.0.0-slim
 
 # Maintainer
 LABEL maintainer="Alexander Graf <hi@otherguy.io"
