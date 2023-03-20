@@ -18,7 +18,7 @@ spec:
       containers:
 
         - name: operator
-          image: otherguy/pod-cleanup-operator:1.0.0
+          image: otherguy/k8s-operator-cleanup:1.0.0
           imagePullPolicy: IfNotPresent
           args:
           # - --namespace=default
@@ -27,6 +27,7 @@ spec:
           # - --dry-run
             - --quiet
             - --interval=60
+          # - --error-limit=5
             - --lifetime-annotation=pod.kubernetes.io/lifetime
             - --lifetime-max-kills=2
           # - --label-selector='{"app": "my-sample-app"}'

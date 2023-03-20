@@ -1,8 +1,7 @@
 # syntax = docker/dockerfile:1.2
 
-# Start with Google Cloud SDK base image
-# https://console.cloud.google.com/gcr/images/google.com:cloudsdktool/GLOBAL/cloud-sdk
-FROM gcr.io/google.com/cloudsdktool/cloud-sdk:422.0.0-slim
+# Start with Python base image
+FROM python:3.10.10
 
 # Maintainer
 LABEL maintainer="Alexander Graf <hi@otherguy.io"

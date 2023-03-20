@@ -7,6 +7,7 @@ import argparse
 from decouple import config
 from tempora import parse_timedelta
 from random import sample
+from requests.exceptions import RequestException
 import datetime
 import json
 import os
@@ -17,7 +18,7 @@ import sys
 
 def signal_handler(sig, frame):
     """Signal handler callback"""
-    print("Exiting.")
+    print("SIGINT received. Exiting.")
     sys.exit(0)
 
 
@@ -257,6 +258,12 @@ def main():
         help="Time in seconds [default: 60] to wait between two runs",
     )
     parser.add_argument(
+        "--error-limit",
+        type=int,
+        default=5,
+        help="How many consecutive errors [default: 5] are allowed before exiting",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         default=False,
@@ -278,6 +285,9 @@ def main():
 
     # Get a Kubernetes API instance
     kubectl = get_kubernetes_interface()
+
+    # Start error counter
+    errorcount = 0
 
     # Main application loop
     while True:
@@ -349,10 +359,24 @@ def main():
                     if args.dry_run == False:
                         pod.delete()
 
+            # Sleep for the given interval
             time.sleep(args.interval)
+
+            # Reset error counter
+            errorcount = 0
+
         except pykube.exceptions.KubernetesError as err:
             print("KubernetesError: {0}".format(err), file=sys.stderr)
             time.sleep(args.interval*1.5)
+            errorcount += 1
+        except RequestException as err:
+            print("RequestException: {0}".format(str(err)), file=sys.stderr)
+            time.sleep(args.interval*1.5)
+            errorcount += 1
+        finally:
+            if errorcount >= args.error_limit:
+                print("Too many errors ({}) when communicating with the control plane, stopping now.".format(args.error_limit), file=sys.stderr)
+                sys.exit(1)
 
 
 ###############################################################################
