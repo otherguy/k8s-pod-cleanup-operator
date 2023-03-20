@@ -1,4 +1,4 @@
 pykube-ng==22.9.0
 argparse==1.4.0
-python-decouple==3.7
+python-decouple==3.8
 tempora==5.2.1
