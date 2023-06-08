@@ -234,6 +234,12 @@ def main():
         help="Delete only Jobs and Pods that meet the label selector",
     )
     parser.add_argument(
+        "--skip-with-owner",
+        action="store_true",
+        default=False,
+        help="Skip deletion of pods which currently have an active owner reference",
+    )
+    parser.add_argument(
         "--lifetime-annotation",
         type=str,
         default="pod.kubernetes.io/lifetime",
@@ -321,6 +327,10 @@ def main():
                                 if not args.quiet:
                                     print("Skipping system pod {} in {} namespace".format(pod.name, pod.namespace))
                             else:
+                                if args.skip_with_owner and pod.metadata.get("ownerReferences"):
+                                    if not args.quiet:
+                                        print("Skipping pod with owner reference {} in {} namespace".format(pod.name, pod.namespace))
+                                    continue
                                 delete_entity(pod, args.graceperiod, args.dry_run)
                                 pod_deletion_counter += 1
 
@@ -342,6 +352,11 @@ def main():
                         if (datetime.datetime.now().astimezone() - pod_creation_timestamp) > pod_annotated_lifetime_timedelta:
                             if not args.quiet:
                                 print("Pod {} in {} namespace has '{}' annotation of {} and will be considered for termination (actual age {})".format(pod.name, pod.namespace, args.lifetime_annotation, pod_annotated_lifetime, strfdelta_round(datetime.datetime.now().astimezone() - pod_creation_timestamp), pod_annotated_lifetime_timedelta))
+                            if args.skip_with_owner and pod.metadata.get("ownerReferences"):
+                                if not args.quiet:
+                                    print("Skipping pod with owner reference {} in {} namespace".format(pod.name, pod.namespace))
+                                continue
+
                             expired_pods.append(pod)
 
                     except (TypeError, ValueError) as err:
