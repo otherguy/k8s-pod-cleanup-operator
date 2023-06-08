@@ -64,6 +64,7 @@ deployment.apps/pod-cleanup-operator created
 | `--interval`                     | `60`                         |                                   | Seconds to wait between runs.                                                                                                                                                                                |
 | `--error-limit`                  | `5`                          |                                   | How many errors are allowed before exiting.                                                                                                                                                                  |
 | `--dry-run`                      |                              |                                   | If the `--dry-run` flag is set, no actual deletion is performed. This can be used for testing.                                                                                                               |
+| `--skip-with-owner`              |                              |                                   | Kubernetes resources with active owner reference will be skipped by enabling this flag 
 
 In addition to the parameters above, the application takes 1 or more status arguments that filter the set of pods to be
 deleted based on their current state. Each of those arguments can either just be
