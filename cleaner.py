@@ -36,7 +36,6 @@ log_level_mapping = {
 # Set the logger level
 logger.setLevel(log_level_mapping.get(os.getenv('LOG_LEVEL', 'INFO').upper(), logging.INFO))
 
-
 def signal_handler(sig, frame):
     """Signal handler callback"""
     logger.warning("SIGINT received. Exiting.")
@@ -143,7 +142,7 @@ def delete_entity(entity: Union[pykube.objects.Pod, pykube.objects.Job], max_age
     logger.info("{}Deleting {} {} in namespace {} because of {} ({}) status and age {}s.".format(dry_run_message, entity.kind, entity.name, entity.namespace, entity.obj["status"].get("phase"), entity.obj["status"].get("reason"), entity_age), extra={
         "dryrun": dry_run,
         "kind": entity.kind,
-        "name": entity.name,
+        "resource": entity.name,
         "namespace": entity.namespace,
         "phase": entity.obj["status"].get("phase"),
         "reason": entity.obj["status"].get("reason"),
