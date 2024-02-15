@@ -4,6 +4,8 @@
 import pykube
 import time
 import argparse
+import logging
+from json_formatter import JsonFormatter
 from decouple import config
 from tempora import parse_timedelta
 from random import sample
@@ -16,9 +18,28 @@ import signal
 import sys
 
 
+# Setup logging
+logger = logging.getLogger(__name__)
+logHandler = logging.StreamHandler()
+logHandler.setFormatter(JsonFormatter('%(message)s %(levelname)s', timestamp=True))
+logger.addHandler(logHandler)
+
+# Convert log level string to logging level
+log_level_mapping = {
+    'DEBUG': logging.DEBUG,
+    'INFO': logging.INFO,
+    'WARNING': logging.WARNING,
+    'ERROR': logging.ERROR,
+    'CRITICAL': logging.CRITICAL
+}
+
+# Set the logger level
+logger.setLevel(log_level_mapping.get(os.getenv('LOG_LEVEL', 'INFO').upper(), logging.INFO))
+
+
 def signal_handler(sig, frame):
     """Signal handler callback"""
-    print("SIGINT received. Exiting.")
+    logger.warning("SIGINT received. Exiting.")
     sys.exit(0)
 
 
@@ -43,10 +64,10 @@ def get_kubernetes_interface():
     """
     try:
         config = pykube.KubeConfig.from_service_account()
-        print("Using Kubernetes service account for authentication")
+        logger.debug("Using Kubernetes service account for authentication")
     except FileNotFoundError:
         config = pykube.KubeConfig.from_file(os.path.expanduser("~/.kube/config"))
-        print("Using local ~/.kube/config for authentication")
+        logger.debug("Using local ~/.kube/config for authentication")
 
     return pykube.HTTPClient(config)
 
@@ -119,7 +140,15 @@ def delete_entity(entity: Union[pykube.objects.Pod, pykube.objects.Job], max_age
     # Prepare message if this is a dry run
     dry_run_message = "[DRY RUN] " if dry_run else ""
 
-    print("{}Deleting {} {} in namespace {} because of {} ({}) status and age {}s.".format(dry_run_message, entity.kind, entity.name, entity.namespace, entity.obj["status"].get("phase"), entity.obj["status"].get("reason"), entity_age))
+    logger.info("{}Deleting {} {} in namespace {} because of {} ({}) status and age {}s.".format(dry_run_message, entity.kind, entity.name, entity.namespace, entity.obj["status"].get("phase"), entity.obj["status"].get("reason"), entity_age), extra={
+        "dryrun": dry_run,
+        "kind": entity.kind,
+        "name": entity.name,
+        "namespace": entity.namespace,
+        "phase": entity.obj["status"].get("phase"),
+        "reason": entity.obj["status"].get("reason"),
+        "age": entity_age
+     })
 
     if dry_run == False:
         return entity.delete()
@@ -173,7 +202,7 @@ def strfdelta_round(tdelta, round_period="second"):
     for i in range(len(period_names)):
         q, remainder = divmod(remainder, period_seconds[i])
         if int(q) > 0:
-            if not len(s) == 0:
+            if len(s) != 0:
                 s += " "
             s += f"{q:.0f}{period_desc[i]}"
         if i == round_i:
@@ -287,7 +316,11 @@ def main():
     app_version = config("VERSION", default="0.x")
     app_vcs_ref = config("VCS_REF", default="main")
     app_build_date = config("BUILD_DATE", default=datetime.datetime.now(datetime.timezone.utc).isoformat())
-    print("Pod Cleanup Operator. Version: {}, Commit: {}, Build Date: {}".format(app_version, app_vcs_ref, app_build_date))
+    logger.info("Pod Cleanup Operator. Version: {}, Commit: {}, Build Date: {}".format(app_version, app_vcs_ref, app_build_date), extra={
+        "version": app_version,
+        "commit": app_vcs_ref,
+        "build_date": app_build_date
+    })
 
     # Get a Kubernetes API instance
     kubectl = get_kubernetes_interface()
@@ -325,18 +358,21 @@ def main():
                         if reason == None or pod_status.get("reason") == reason:
                             if pod.namespace == "kube-system" and args.user == True:
                                 if not args.quiet:
-                                    print("Skipping system pod {} in {} namespace".format(pod.name, pod.namespace))
+                                    logger.debug("Skipping system pod {} in {} namespace".format(pod.name, pod.namespace))
                             else:
                                 if args.skip_with_owner and pod.metadata.get("ownerReferences"):
                                     if not args.quiet:
-                                        print("Skipping pod with owner reference {} in {} namespace".format(pod.name, pod.namespace))
+                                        logger.debug("Skipping pod with owner reference {} in {} namespace".format(pod.name, pod.namespace))
                                     continue
                                 delete_entity(pod, args.graceperiod, args.dry_run)
                                 pod_deletion_counter += 1
 
             # Sleep 15 seconds before running the next iteration.
             if not args.quiet or (pod_deletion_counter > 0 or job_deletion_counter > 0):
-                print("Deleted {} pods and {} jobs.".format(pod_deletion_counter, job_deletion_counter))
+                logger.debug("Deleted {} pods and {} jobs.".format(pod_deletion_counter, job_deletion_counter), extra={
+                    "pods": pod_deletion_counter,
+                    "jobs": job_deletion_counter
+                })
 
             # Select pods to be killed based on their lifetime.
             expired_pods = []
@@ -351,10 +387,10 @@ def main():
                         pod_annotated_lifetime_timedelta = parse_timedelta(pod_annotated_lifetime)
                         if (datetime.datetime.now().astimezone() - pod_creation_timestamp) > pod_annotated_lifetime_timedelta:
                             if not args.quiet:
-                                print("Pod {} in {} namespace has '{}' annotation of {} and will be considered for termination (actual age {})".format(pod.name, pod.namespace, args.lifetime_annotation, pod_annotated_lifetime, strfdelta_round(datetime.datetime.now().astimezone() - pod_creation_timestamp), pod_annotated_lifetime_timedelta))
+                                logger.debug("Pod {} in {} namespace has '{}' annotation of {} and will be considered for termination (actual age {})".format(pod.name, pod.namespace, args.lifetime_annotation, pod_annotated_lifetime, strfdelta_round(datetime.datetime.now().astimezone() - pod_creation_timestamp)))
                             if args.skip_with_owner and pod.metadata.get("ownerReferences"):
                                 if not args.quiet:
-                                    print("Skipping pod with owner reference {} in {} namespace".format(pod.name, pod.namespace))
+                                    logger.debug("Skipping pod with owner reference {} in {} namespace".format(pod.name, pod.namespace))
                                 continue
 
                             expired_pods.append(pod)
