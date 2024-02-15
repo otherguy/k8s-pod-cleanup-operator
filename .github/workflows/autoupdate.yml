@@ -6,10 +6,10 @@ on:
 jobs:
   autoupdate:
     name: autoupdate
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: docker://chinthakagodawita/autoupdate-action:v1
         env:
           GITHUB_TOKEN: "${{ secrets.github_token }}"
           MERGE_CONFLICT_ACTION: "ignore"
-          MERGE_MSG: "chore(merge): branch was updated"
+          MERGE_MSG: '🔀 Update branch'
