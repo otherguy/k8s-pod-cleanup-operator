@@ -12,15 +12,17 @@ ARG DEBCONF_NONINTERACTIVE_SEEN=true
 
 # Change workdir
 WORKDIR /app/
+RUN useradd -u 65532 -ms /bin/bash service && chown -R service /app
+USER 65532:65532
 
 # Copy dependencies
-COPY requirements.txt .
+COPY --chown=service requirements.txt .
 
 # Install requirements
 RUN pip3 install -r requirements.txt --progress-bar off
 
 # Copy app
-COPY . .
+COPY --chown=service . .
 
 # Build arguments
 ARG VCS_REF=main
