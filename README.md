@@ -1,8 +1,8 @@
-# ☸️ K8s Pod Cleanup Operator
+# ☸️ Kubernetes Pod Cleanup Operator
 
 A Kubernetes Operator to clean up expired pods in any desired non-running state.
 
-## 🛠 What does it do?
+## What does it do? 🛠 
 
 This lightweight Kubernetes Operator will clean up expired pods in any desired non-running state.
 
@@ -28,7 +28,7 @@ spec:
         pod.kubernetes.io/lifetime: "12 hours"
 ```
 
-## 🚀 Usage and Deployment
+## Usage and Deployment 🚀 
 
 - First, you need a _Kubernetes Service Account_ with the permission to look and, if necessary, delete Pods and Jobs.
 - Then, adapt the [`deployment.yaml`](k8s/deployment.yaml) to suit your needs. This involves picking the correct image
@@ -80,7 +80,7 @@ state and have their termination reason set to `Shutdown`.
 - [Managing Service Accounts](https://kubernetes.io/docs/reference/access-authn-authz/service-accounts-admin/)
 - [Configure Service Accounts for Pods](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/)
 
-## 👩🏼‍💻 Running Locally
+## Running Locally 👩🏼‍💻 
 
 The Python script can use either a Service Account for authenticatiob (when deployed in Kubernetes) or your local
 `~/.kube/config` file when running locally.
@@ -101,8 +101,18 @@ Using local ~/.kube/config for authentication
 Deleted 0 pods and 0 jobs.
 ```
 
-## 🤔 What is a Kubernetes Operator?
+## What is a Kubernetes Operator? 🤔 
 
 A Kubernetes operator is an application-specific controller that extends the functionality of
 the Kubernetes API to create, configure, and manage instances of complex applications on behalf
 of a Kubernetes user.
+
+## Contributing 🚧
+
+Bug reports and pull requests are welcome on GitHub at [`otherguy/k8s-pod-cleanup-operator`](https://github.com/otherguy/k8s-pod-cleanup-operator).
+
+## Acknowledgements ♥️
+
+* Thank you to [`@tonobo`](https://github.com/tonobo) for contributing https://github.com/otherguy/k8s-pod-cleanup-operator/pull/44
+
+A big ♥️ _thank you_ to all creators!
