@@ -13,7 +13,7 @@ ARG DEBCONF_NONINTERACTIVE_SEEN=true
 # Change working directory
 WORKDIR /app/
 
-RUN useradd -u 1001 --home-dir /app --user-group --shell /usr/sbin/nologin nonroot \ 
+RUN useradd -u 1001 --home-dir /app --user-group --shell /usr/sbin/nologin nonroot \
  && chown -R nonroot:nonroot /app
 
 # Switch to nonroot user
@@ -23,7 +23,7 @@ USER nonroot
 COPY --chown=nonroot:nonroot requirements.txt .
 
 # Install requirements
-RUN pip3 install -r requirements.txt --progress-bar off
+RUN pip3 install --user -r requirements.txt --progress-bar off --no-cache-dir
 
 # Copy app
 COPY --chown=nonroot:nonroot . .
@@ -44,9 +44,9 @@ LABEL org.label-schema.build-date     '${BUILD_DATE}'
 LABEL org.label-schema.vcs-ref        '${VCS_REF}'
 
 # Expose environment variables to app
-ENV VCS_REF="${VCS_REF}"
-ENV BUILD_DATE="${BUILD_DATE}"
-ENV VERSION="${VERSION}"
+ENV VCS_REF="${VCS_REF}" \
+    BUILD_DATE="${BUILD_DATE}" \
+    VERSION="${VERSION}"
 
 # Configure app
 ENV PYTHONUNBUFFERED="1"
