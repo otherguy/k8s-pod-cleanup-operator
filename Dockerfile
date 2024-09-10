@@ -13,7 +13,8 @@ ARG DEBCONF_NONINTERACTIVE_SEEN=true
 # Change working directory
 WORKDIR /app/
 
-RUN useradd -u 1001 --home-dir /app --user-group --shell /usr/sbin/nologin nonroot \
+RUN groupadd -g 1001 nonroot \
+ && useradd -u 1001 -g 1001 --home-dir /app --shell /usr/sbin/nologin nonroot \
  && chown -R nonroot:nonroot /app
 
 # Copy dependencies
