@@ -16,14 +16,14 @@ WORKDIR /app/
 RUN useradd -u 1001 --home-dir /app --user-group --shell /usr/sbin/nologin nonroot \
  && chown -R nonroot:nonroot /app
 
-# Switch to nonroot user
-USER nonroot
-
 # Copy dependencies
-COPY --chown=nonroot:nonroot requirements.txt .
+COPY requirements.txt .
 
 # Install requirements
 RUN pip3 install --user -r requirements.txt --progress-bar off --no-cache-dir
+
+# Switch to nonroot user
+USER nonroot
 
 # Copy app
 COPY --chown=nonroot:nonroot . .
