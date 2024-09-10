@@ -17,6 +17,9 @@ RUN groupadd -g 1001 nonroot \
  && useradd -u 1001 -g 1001 --home-dir /app --shell /usr/sbin/nologin nonroot \
  && chown -R nonroot:nonroot /app
 
+# Switch to non-root user
+USER nonroot:nonroot
+
 # Copy dependencies
 COPY --chown=nonroot:nonroot requirements.txt .
 
