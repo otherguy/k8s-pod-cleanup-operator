@@ -20,7 +20,7 @@ RUN useradd -u 1001 --home-dir /app --user-group --shell /usr/sbin/nologin nonro
 USER nonroot
 
 # Copy dependencies
-COPY --chown=service requirements.txt .
+COPY --chown=nonroot:nonroot requirements.txt .
 
 # Install requirements
 RUN pip3 install -r requirements.txt --progress-bar off
