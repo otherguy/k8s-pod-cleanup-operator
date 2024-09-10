@@ -10,17 +10,23 @@ LABEL maintainer="Alexander Graf <hi@otherguy.io"
 ARG DEBIAN_FRONTEND=noninteractive
 ARG DEBCONF_NONINTERACTIVE_SEEN=true
 
-# Change workdir
+# Change working directory
 WORKDIR /app/
 
+RUN useradd -u 1001 --home-dir /app --user-group --shell /usr/sbin/nologin nonroot \ 
+ && chown -R nonroot:nonroot /app
+
+# Switch to nonroot user
+USER nonroot
+
 # Copy dependencies
-COPY requirements.txt .
+COPY --chown=nonroot:nonroot requirements.txt .
 
 # Install requirements
 RUN pip3 install -r requirements.txt --progress-bar off
 
 # Copy app
-COPY . .
+COPY --chown=nonroot:nonroot . .
 
 # Build arguments
 ARG VCS_REF=main
