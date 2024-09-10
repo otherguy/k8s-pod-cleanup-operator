@@ -26,7 +26,7 @@ COPY --chown=nonroot:nonroot requirements.txt .
 RUN pip3 install -r requirements.txt --progress-bar off
 
 # Copy app
-COPY --chown=service . .
+COPY --chown=nonroot:nonroot . .
 
 # Build arguments
 ARG VCS_REF=main
