@@ -10,10 +10,14 @@ LABEL maintainer="Alexander Graf <hi@otherguy.io"
 ARG DEBIAN_FRONTEND=noninteractive
 ARG DEBCONF_NONINTERACTIVE_SEEN=true
 
-# Change workdir
+# Change working directory
 WORKDIR /app/
-RUN useradd -u 65532 -ms /bin/bash service && chown -R service /app
-USER 65532:65532
+
+RUN useradd -u 1001 --home-dir /app --user-group --shell /usr/sbin/nologin nonroot \ 
+ && chown -R nonroot:nonroot /app
+
+# Switch to nonroot user
+USER nonroot
 
 # Copy dependencies
 COPY --chown=service requirements.txt .
