@@ -14,7 +14,7 @@ ARG DEBCONF_NONINTERACTIVE_SEEN=true
 WORKDIR /app/
 
 RUN groupadd -g 1001 nonroot \
- && useradd -u 1001 -g 1001 --home-dir /app --shell /usr/sbin/nologin nonroot \
+ && useradd -u 1001 -g 1001 --home-dir /app --shell /bin/bash nonroot \
  && chown -R nonroot:nonroot /app
 
 # Switch to non-root user
