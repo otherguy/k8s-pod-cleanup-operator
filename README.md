@@ -2,6 +2,11 @@
 
 A Kubernetes Operator to clean up expired pods in any desired non-running state.
 
+[![Docker Version](https://img.shields.io/docker/v/otherguy/k8s-operator-cleanup?sort=semver&style=for-the-badge&logo=docker&logoColor=aaa)][dockerhub]
+[![Docker Pulls](https://img.shields.io/docker/pulls/otherguy/k8s-operator-cleanup?style=for-the-badge&logo=docker&logoColor=aaa)][dockerhub]
+[![GitHub issues](https://img.shields.io/github/issues/otherguy/k8s-pod-cleanup-operator?style=for-the-badge&logo=github)][issues]
+[![License](https://img.shields.io/github/license/otherguy/k8s-pod-cleanup-operator?style=for-the-badge&logo=readthedocs&logoColor=aaa)][license]
+
 ## What does it do? 🛠 
 
 This lightweight Kubernetes Operator will clean up expired pods in any desired non-running state.
@@ -116,3 +121,9 @@ Bug reports and pull requests are welcome on GitHub at [`otherguy/k8s-pod-cleanu
 * Thank you to [`@tonobo`](https://github.com/tonobo) for contributing https://github.com/otherguy/k8s-pod-cleanup-operator/pull/44
 
 A big ♥️ _thank you_ to all creators!
+
+
+
+[dockerhub]: https://hub.docker.com/repository/docker/otherguy/k8s-operator-cleanup
+[issues]: https://github.com/otherguy/k8s-pod-cleanup-operator/issues
+[license]: https://github.com/otherguy/k8s-pod-cleanup-operator/blob/main/LICENSE.md
