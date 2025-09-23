@@ -12,8 +12,8 @@ class JsonFormatter(jsonlogger.JsonFormatter):
     def add_fields(self, log_record, record, message_dict):
         super().add_fields(log_record, record, message_dict)
         log_record["level"] = record.levelname
-        del log_record["levelname"]
-        del log_record["taskName"]
+        log_record.pop("levelname", None)
+        log_record.pop("taskName", None)
 
         self.set_extra_keys(record, log_record, self._skip_fields)
 
