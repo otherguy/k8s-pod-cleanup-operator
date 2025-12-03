@@ -1,7 +1,7 @@
 # syntax = docker/dockerfile:1.12
 
 # Start with Python base image
-FROM python:3.13.7-slim
+FROM python:3.14.1-slim
 
 # Maintainer
 LABEL maintainer="Alexander Graf <hi@otherguy.io"
